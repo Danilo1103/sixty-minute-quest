@@ -98,9 +98,12 @@ export const TaskForm = ({ onSubmit, onCancel, initialData, isEditing = false }:
   };
 
   return (
-    <Card>
+    <Card className="animate-in slide-in-from-top-2 duration-300">
       <CardHeader>
-        <CardTitle>{isEditing ? 'Edit Task' : 'Add New Task'}</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          {isEditing ? 'Edit Task' : 'Add New Task'}
+          <div className="h-2 w-2 bg-primary rounded-full animate-pulse"></div>
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -114,7 +117,10 @@ export const TaskForm = ({ onSubmit, onCancel, initialData, isEditing = false }:
               value={formData.title}
               onChange={(e) => handleInputChange('title', e.target.value)}
               placeholder="Enter task title..."
-              className={cn(errors.title && "border-destructive")}
+              className={cn(
+                "transition-all duration-200 focus:scale-[1.02]",
+                errors.title && "border-destructive animate-pulse"
+              )}
               maxLength={100}
             />
             {errors.title && (
@@ -133,7 +139,10 @@ export const TaskForm = ({ onSubmit, onCancel, initialData, isEditing = false }:
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
               placeholder="Enter task description..."
-              className={cn(errors.description && "border-destructive")}
+              className={cn(
+                "transition-all duration-200 focus:scale-[1.01] resize-none",
+                errors.description && "border-destructive animate-pulse"
+              )}
               maxLength={500}
               rows={3}
             />
@@ -154,7 +163,10 @@ export const TaskForm = ({ onSubmit, onCancel, initialData, isEditing = false }:
               value={formData.priority}
               onValueChange={(value: Priority) => handleInputChange('priority', value)}
             >
-              <SelectTrigger className={cn(errors.priority && "border-destructive")}>
+              <SelectTrigger className={cn(
+                "transition-all duration-200 focus:scale-[1.02]",
+                errors.priority && "border-destructive animate-pulse"
+              )}>
                 <SelectValue placeholder="Select priority" />
               </SelectTrigger>
               <SelectContent>
@@ -220,15 +232,23 @@ export const TaskForm = ({ onSubmit, onCancel, initialData, isEditing = false }:
             <Button 
               type="submit" 
               disabled={isSubmitting}
-              className="flex-1"
+              className="flex-1 transition-all duration-200 hover:scale-[1.02] disabled:hover:scale-100"
             >
-              {isSubmitting ? 'Saving...' : (isEditing ? 'Update Task' : 'Add Task')}
+              {isSubmitting ? (
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  Saving...
+                </div>
+              ) : (
+                isEditing ? 'Update Task' : 'Add Task'
+              )}
             </Button>
             <Button 
               type="button" 
               variant="outline" 
               onClick={onCancel}
               disabled={isSubmitting}
+              className="transition-all duration-200 hover:scale-[1.02] disabled:hover:scale-100"
             >
               Cancel
             </Button>

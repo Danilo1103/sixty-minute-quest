@@ -41,8 +41,8 @@ const getPriorityLabel = (priority: Priority) => {
 
 export const TaskCard = ({ task, onToggleComplete, onEdit, onDelete }: TaskCardProps) => {
   return (
-    <Card className={`transition-all duration-200 hover:shadow-md ${
-      task.completed ? 'opacity-75' : ''
+    <Card className={`transition-all duration-300 hover:shadow-lg hover:scale-[1.02] ${
+      task.completed ? 'opacity-75 bg-muted/30' : 'hover:bg-card/50'
     }`}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-4">
@@ -72,7 +72,8 @@ export const TaskCard = ({ task, onToggleComplete, onEdit, onDelete }: TaskCardP
               variant="ghost"
               size="sm"
               onClick={() => onEdit(task.id)}
-              className="h-8 w-8 p-0"
+              className="h-8 w-8 p-0 transition-all duration-200 hover:bg-primary/10 hover:scale-110"
+              aria-label={`Edit task: ${task.title}`}
             >
               <Edit className="h-4 w-4" />
             </Button>
@@ -80,7 +81,8 @@ export const TaskCard = ({ task, onToggleComplete, onEdit, onDelete }: TaskCardP
               variant="ghost"
               size="sm"
               onClick={() => onDelete(task.id)}
-              className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+              className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10 transition-all duration-200 hover:scale-110"
+              aria-label={`Delete task: ${task.title}`}
             >
               <Trash2 className="h-4 w-4" />
             </Button>

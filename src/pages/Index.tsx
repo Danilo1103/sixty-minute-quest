@@ -4,21 +4,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Clock, CheckCircle2, Plus, FileText, AlertTriangle } from "lucide-react";
 import { useTimer } from "@/hooks/useTimer";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-
-// TODO: Define proper TypeScript interfaces for Task
-// interface Task {
-//   id: string;
-//   title: string;
-//   description?: string;
-//   priority: 'high' | 'medium' | 'low';
-//   completed: boolean;
-//   dueDate?: Date;
-//   createdAt: Date;
-// }
+import { TaskCard } from "@/components/TaskCard";
+import type { Task, Priority } from "@/types/Task";
+import { useTasks } from "@/hooks/useTasks";
 
 const Index = () => {
-  // TODO: Implement state management for tasks
-  const [tasks, setTasks] = useState([]);
+  // State management with localStorage persistence
+  const { 
+    tasks, 
+    loading, 
+    addTask, 
+    updateTask, 
+    toggleTaskComplete, 
+    deleteTask, 
+    clearAllTasks 
+  } = useTasks();
+  
   const [showForm, setShowForm] = useState(false);
   const [testStarted, setTestStarted] = useState(false);
   
@@ -27,13 +28,53 @@ const Index = () => {
   const handleStartTest = () => {
     setTestStarted(true);
     startTimer();
+    
+    // Add sample tasks for testing if no tasks exist
+    if (tasks.length === 0) {
+      addTask({
+        title: 'Complete technical test',
+        description: 'Implement task management application in 60 minutes',
+        priority: 'high',
+        completed: false,
+        dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000) // Tomorrow
+      });
+      
+      addTask({
+        title: 'Review code',
+        description: 'Review and optimize the implemented code',
+        priority: 'medium',
+        completed: false,
+        dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000) // Day after tomorrow
+      });
+      
+      addTask({
+        title: 'Document features',
+        description: 'Create documentation for implemented features',
+        priority: 'low',
+        completed: true
+      });
+    }
   };
   
   const handleResetTest = () => {
     setTestStarted(false);
     resetTimer();
-    setTasks([]);
+    clearAllTasks();
     setShowForm(false);
+  };
+
+  // Task management functions
+  const handleToggleComplete = (id: string) => {
+    toggleTaskComplete(id);
+  };
+
+  const handleEditTask = (id: string) => {
+    // TODO: Implement edit functionality in next step
+    console.log('Edit task:', id);
+  };
+
+  const handleDeleteTask = (id: string) => {
+    deleteTask(id);
   };
 
   return (
@@ -176,7 +217,9 @@ const Index = () => {
                 <div>
                   <h2 className="text-2xl font-semibold">My Tasks</h2>
                   <p className="text-muted-foreground">
-                    {tasks.length === 0 ? "No tasks yet" : `${tasks.length} tasks`}
+                    {loading ? "Loading..." : 
+                     tasks.length === 0 ? "No tasks yet" : 
+                     `${tasks.length} tasks (${tasks.filter(t => !t.completed).length} pending)`}
                   </p>
                 </div>
                 <Button 
@@ -209,7 +252,17 @@ const Index = () => {
 
               {/* Task List Area */}
               <div className="space-y-4">
-                {tasks.length === 0 ? (
+                {loading ? (
+                  <Card className="border-dashed">
+                    <CardContent className="flex flex-col items-center justify-center py-12">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+                      <h3 className="text-lg font-medium mb-2">Loading tasks...</h3>
+                      <p className="text-muted-foreground text-center max-w-sm">
+                        Please wait while we load your tasks from storage.
+                      </p>
+                    </CardContent>
+                  </Card>
+                ) : tasks.length === 0 ? (
                   <Card className="border-dashed">
                     <CardContent className="flex flex-col items-center justify-center py-12">
                       <CheckCircle2 className="w-12 h-12 text-muted-foreground mb-4" />
@@ -221,10 +274,15 @@ const Index = () => {
                   </Card>
                 ) : (
                   <div className="grid gap-4">
-                    {/* TODO: Map through tasks and render TaskCard components */}
-                    <p className="text-muted-foreground">
-                      🚧 TODO: Implement TaskCard components here
-                    </p>
+                    {tasks.map((task) => (
+                      <TaskCard
+                        key={task.id}
+                        task={task}
+                        onToggleComplete={handleToggleComplete}
+                        onEdit={handleEditTask}
+                        onDelete={handleDeleteTask}
+                      />
+                    ))}
                   </div>
                 )}
               </div>

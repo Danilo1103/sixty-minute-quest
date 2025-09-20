@@ -57,6 +57,32 @@ const Index = () => {
         completed: true
       });
     }
+    
+    // Add sample tasks for testing if no tasks exist
+    if (tasks.length === 0) {
+      addTask({
+        title: 'Complete technical test',
+        description: 'Implement task management application in 60 minutes',
+        priority: 'high',
+        completed: false,
+        dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000) // Tomorrow
+      });
+      
+      addTask({
+        title: 'Review code',
+        description: 'Review and optimize the implemented code',
+        priority: 'medium',
+        completed: false,
+        dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000) // Day after tomorrow
+      });
+      
+      addTask({
+        title: 'Document features',
+        description: 'Create documentation for implemented features',
+        priority: 'low',
+        completed: true
+      });
+    }
   };
   
   const handleResetTest = () => {

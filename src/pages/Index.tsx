@@ -5,7 +5,8 @@ import { Clock, CheckCircle2, Plus, FileText, AlertTriangle } from "lucide-react
 import { useTimer } from "@/hooks/useTimer";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { TaskCard } from "@/components/TaskCard";
-import type { Task, Priority } from "@/types/Task";
+import { TaskForm } from "@/components/TaskForm";
+import type { Task, Priority, TaskFormData } from "@/types/Task";
 import { useTasks } from "@/hooks/useTasks";
 
 const Index = () => {
@@ -17,11 +18,13 @@ const Index = () => {
     updateTask, 
     toggleTaskComplete, 
     deleteTask, 
-    clearAllTasks 
+    clearAllTasks,
+    getTaskById
   } = useTasks();
   
   const [showForm, setShowForm] = useState(false);
   const [testStarted, setTestStarted] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
   
   const { timeRemaining, isTimeUp, formatTime, startTimer, resetTimer } = useTimer(3600); // 60 minutes
   
@@ -69,12 +72,43 @@ const Index = () => {
   };
 
   const handleEditTask = (id: string) => {
-    // TODO: Implement edit functionality in next step
-    console.log('Edit task:', id);
+    const task = getTaskById(id);
+    if (task) {
+      setEditingTask(task);
+      setShowForm(true);
+    }
   };
 
   const handleDeleteTask = (id: string) => {
     deleteTask(id);
+  };
+
+  // Form handling functions
+  const handleFormSubmit = (taskData: TaskFormData) => {
+    if (editingTask) {
+      // Update existing task
+      updateTask(editingTask.id, taskData);
+    } else {
+      // Add new task
+      addTask({
+        ...taskData,
+        completed: false
+      });
+    }
+    
+    // Reset form state
+    setShowForm(false);
+    setEditingTask(null);
+  };
+
+  const handleFormCancel = () => {
+    setShowForm(false);
+    setEditingTask(null);
+  };
+
+  const handleAddTask = () => {
+    setEditingTask(null);
+    setShowForm(true);
   };
 
   return (
@@ -223,7 +257,7 @@ const Index = () => {
                   </p>
                 </div>
                 <Button 
-                  onClick={() => setShowForm(!showForm)}
+                  onClick={handleAddTask}
                   className="bg-primary hover:bg-primary/90"
                   disabled={isTimeUp}
                 >
@@ -232,22 +266,19 @@ const Index = () => {
                 </Button>
               </div>
 
-              {/* TODO: Add TaskForm component here when showForm is true */}
+              {/* TaskForm component */}
               {showForm && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Add New Task</CardTitle>
-                    <CardDescription>Create a new task to manage your work</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">
-                      🚧 TODO: Implement the TaskForm component here
-                    </p>
-                    <p className="text-sm mt-2 text-muted-foreground">
-                      Form should include: title, description, priority, due date
-                    </p>
-                  </CardContent>
-                </Card>
+                <TaskForm
+                  onSubmit={handleFormSubmit}
+                  onCancel={handleFormCancel}
+                  initialData={editingTask ? {
+                    title: editingTask.title,
+                    description: editingTask.description,
+                    priority: editingTask.priority,
+                    dueDate: editingTask.dueDate
+                  } : undefined}
+                  isEditing={!!editingTask}
+                />
               )}
 
               {/* Task List Area */}
